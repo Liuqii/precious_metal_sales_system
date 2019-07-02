@@ -28,7 +28,6 @@ import java.util.Map;
  * 用于打印销售凭证
  */
 public class OrderApp {
-
     public static void main(String[] args) throws Exception {
         if (args.length != 2) {
             throw new IllegalArgumentException("参数不正确。参数1为销售订单的JSON文件名，参数2为待打印销售凭证的文本文件名.");
@@ -40,7 +39,6 @@ public class OrderApp {
         String result = app.checkout(orderCommand);
         FileUtils.writeToFile(result, "F:/a.txt");
     }
-    
     public String checkout(String orderCommand) throws Exception {
         OrderCommand command = OrderCommand.from(orderCommand);
         OrderRepresentation result = checkout(command);
@@ -219,4 +217,5 @@ public class OrderApp {
 		        return fullDiscount;
 		    }
 		}
+
 }

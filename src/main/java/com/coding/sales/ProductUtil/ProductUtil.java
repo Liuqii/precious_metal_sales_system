@@ -53,7 +53,7 @@ public class ProductUtil {
             if (productId.equals( product.getProductId()))
                 return product;
         }
-        throw new Exception("商品不存在");
+        throw new Exception("编号："+productId+"的商品不存在");
 
     }
 
