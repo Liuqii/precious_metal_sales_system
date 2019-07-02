@@ -30,9 +30,9 @@ public class OrderAppTest {
     }
 
     @Test
-    public void should_checkout_order() {
+    public void should_checkout_order() throws Exception {
         String orderCommand = FileUtils.readFromFile(getResourceFilePath(commandFileName));
-        OrderApp app = new OrderApp();
+        OrderApp app = new OrderApp(); 
         String actualResult = app.checkout(orderCommand);
 
         String expectedResult = FileUtils.readFromFile(getResourceFilePath(expectedResultFileName));
