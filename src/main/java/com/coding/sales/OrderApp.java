@@ -11,7 +11,6 @@ import com.coding.sales.output.OrderItemRepresentation;
 import com.coding.sales.output.OrderRepresentation;
 import com.coding.sales.output.PaymentRepresentation;
 
-import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -66,7 +65,7 @@ public class OrderApp {
         	Product p = ProductUtil.getProductById(productId);
         	total = total.add(p.getPrice().multiply(amount));
         }
-        
+
       //获取优惠明细和金额
     	Map<String,Object> discount = getDiscounts(command);
     	BigDecimal discountPrice = new BigDecimal(discount.get("totalDiscountPrice").toString());
@@ -92,28 +91,28 @@ public class OrderApp {
         result = new OrderRepresentation(command.getOrderId(),format.parse(command.getCreateTime()),command.getMemberId(),m.getName(),scoreAndLevel.get("oldlevel").toString(),scoreAndLevel.get("newlevel").toString(),Integer.parseInt(scoreAndLevel.get("increasescore").toString())  ,Integer.parseInt(scoreAndLevel.get("newscore").toString()),orderItemRepresentationlist,total,DiscountItemRepresentations,discountPrice,total.subtract(discountPrice),paymentRepresentationlist,command.getDiscounts());
         return result;
     }
-    
+
 		//获取优惠明细
-		
+
 		private Map<String,Object> getDiscounts(OrderCommand command) throws Exception {
 		    Map<String,Object> result = new HashMap<String, Object>();
 		    List<DiscountItemRepresentation> discounts = new ArrayList<DiscountItemRepresentation>();
 		    BigDecimal totalDiscountPrice = BigDecimal.ZERO;
-		
+
 		    //获取订单条目
 		    List<OrderItemCommand> items = command.getItems();
-		
+
 		    //获取使用的优惠(9折券、95折券两种)
 		    List<String>  useDiscount1 =  command.getDiscounts();
-		   
+
             StringBuffer useDiscount=new StringBuffer();
             for (String string : useDiscount1) {
             	useDiscount.append(string);
 			}
 
 		    for (OrderItemCommand item:items) {
-		
-		
+
+				totalDiscountPrice = BigDecimal.ZERO;
 		        //获取商品可以使用的优惠
 		        Product product = ProductUtil.getProductById(item.getProduct());
 		        String[] productDiscount1 =  product.getDiscounts();
@@ -121,7 +120,7 @@ public class OrderApp {
 		        for (String string : productDiscount1) {
 		        	productDiscount.append(string);
 				}
-		
+
 		        //打折优惠
 		        BigDecimal discount =  BigDecimal.ZERO;
 		        if(useDiscount1.size()>0){
@@ -132,14 +131,14 @@ public class OrderApp {
 		                //计算95折券的优惠
 		                discount=discount.add(product.getPrice().multiply(item.getAmount()).multiply(BigDecimal.ONE.subtract(new BigDecimal(0.95))));
 		            }
-		
-		
+
+
 		        }
 		        //满减优惠
 		        BigDecimal fullDiscount =BigDecimal.ZERO;
 		        //获取价格总额
 		        BigDecimal totalPrice = product.getPrice().multiply(item.getAmount());
-		
+
 		        //3000满减优惠
 		        BigDecimal fullDiscount_3000=BigDecimal.ZERO;
 		        //2000满减优惠
@@ -151,7 +150,7 @@ public class OrderApp {
 		            while (tempTotalPrice.compareTo(new BigDecimal(3000))>0){
 		                fullDiscount_3000 = fullDiscount_3000.add(new BigDecimal(350));
 		                tempTotalPrice=tempTotalPrice.subtract(new BigDecimal(3000));
-		
+
 		            }
 		        }
 		        if(productDiscount.toString().contains("每满2000元减30")){
@@ -159,7 +158,7 @@ public class OrderApp {
 		            while (tempTotalPrice.compareTo(new BigDecimal(2000))>0){
 		                fullDiscount_2000 = fullDiscount_2000.add(new BigDecimal(30));
 		                tempTotalPrice.subtract(new BigDecimal(2000));
-		
+
 		            }
 		        }
 		        if(productDiscount.toString().contains("每满1000元减10")){
@@ -167,7 +166,7 @@ public class OrderApp {
 		            while (tempTotalPrice.compareTo(new BigDecimal(1000))>0){
 		                fullDiscount_1000 = fullDiscount_1000.add(new BigDecimal(10));
 		                tempTotalPrice.subtract(new BigDecimal(1000));
-		
+
 		            }
 		        }
 		        //第三件减半优惠
@@ -177,27 +176,27 @@ public class OrderApp {
 		        }
 		        //买三送一优惠
 		        BigDecimal buyThreeFreeOneDiscount = BigDecimal.ZERO;
-		
+
 		        if(productDiscount.toString().contains("满3送1")&&item.getAmount().compareTo(new BigDecimal(4))>=0){
 		            buyThreeFreeOneDiscount = product.getPrice();
 		        }
 		        //获取最大优惠
 		        BigDecimal largestDiscount =  getLargestDiscount(discount,fullDiscount,fullDiscount_3000,fullDiscount_2000,fullDiscount_1000,thirdHalfDiscount,buyThreeFreeOneDiscount);
-		
+
 		        totalDiscountPrice= totalDiscountPrice.add(largestDiscount);
 		        if(totalDiscountPrice.compareTo(BigDecimal.ZERO)>0){
 			        DiscountItemRepresentation representation = new DiscountItemRepresentation(product.getProductId(),product.getName(),largestDiscount);
-					
+
 			        discounts.add(representation);
 		        }
 
 		    }
-		
+
 		    result.put("totalDiscountPrice",totalDiscountPrice);
 		    result.put("discounts",discounts);
-		
+
 		    return  result;
-		
+
 		}
 		//获取最大优惠
 		private BigDecimal getLargestDiscount(BigDecimal discount, BigDecimal fullDiscount, BigDecimal fullDiscount_3000, BigDecimal fullDiscount_2000, BigDecimal fullDiscount_1000, BigDecimal thirdHalfDiscount, BigDecimal buyThreeFreeOneDiscount) {
@@ -209,7 +208,7 @@ public class OrderApp {
 		      largerDiscount = getLargerNum(buyThreeFreeOneDiscount,largerDiscount);
 		      return  largerDiscount;
 		}
-		
+
 		private BigDecimal getLargerNum(BigDecimal discount, BigDecimal fullDiscount) {
 		    if(discount.compareTo(fullDiscount)>0){
 		        return discount;
